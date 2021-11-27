@@ -2,7 +2,7 @@
   <div class="home-page">
 
     <section class="weather-form-and-response">
-      <form class="weather-form" @submit.prevent="submitWeatherForm">
+      <form v-if="showWeatherForm" class="weather-form" @submit.prevent="submitWeatherForm">
         <div class="form-group">
           <input v-model="city" name="city" placeholder="Enter city" class="form-input" required />
         </div>
@@ -16,13 +16,23 @@
             Reset Form
           </button>
           <button type="submit" class="weather-button">
-            {{ loadingWeatherData ? 'loading...' : 'Get Weather Result' }}
+            {{ loadingWeatherData ? 'loading ...' : 'Get Weather Result' }}
           </button>
         </div>
       </form>
 
+      <button
+        v-if="!showWeatherForm"
+        type="button"
+        class="weather-button is-centered"
+        @click="showWeatherForm = true; weatherResponse = null;"
+      >
+        {{ loadingWeatherData ? 'loading random weather data ...' : 'Get weather for a city' }}
+      </button>
+
       <div v-if="isSuccessfulResponse" class="weather-response">
-        <h4>Weather Result</h4>
+        <h4 v-if="isWeatherResultOfRandomCoordinates">Weather result of random coordinates</h4>
+        <h4 v-else>Weather Result of {{ weatherResponse.name }} city</h4>
         <pre v-text="formattedWeatherResponse" />
       </div>
 
@@ -38,6 +48,7 @@
 export default {
   data () {
     return {
+      showWeatherForm: false,
       city: '',
       country: '',
       weatherResponse: null,
@@ -46,28 +57,30 @@ export default {
   },
 
   computed: {
+    isWeatherResultOfRandomCoordinates () {
+      return this.showWeatherForm === false;
+    },
+
     formattedWeatherResponse () {
       if (this.weatherResponse) return JSON.stringify(this.weatherResponse, null, 2);
       return null;
     },
+
     isSuccessfulResponse () {
       return this.weatherResponse && this.weatherResponse.cod === 200;
     },
+
     isErrorResponse () {
       return this.weatherResponse && this.weatherResponse.cod >= 400;
-    }
+    },
+  },
+
+  created () {
+    this.fetchRandomWeatherdata();
   },
 
   methods: {
-    resetWeatherForm () {
-      this.city = '';
-      this.country = '';
-      this.weatherResponse = null;
-    },
-    async submitWeatherForm () {
-      const query = [this.city, this.country];
-      const params = { q: query.join(',') };
-
+    async fetchWeatherData (params) {
       try {
         this.loadingWeatherData = true;
         const response = await this.$openWeatherApi.getWeatherData(params);
@@ -77,7 +90,31 @@ export default {
       } finally {
         this.loadingWeatherData = false;
       }
-    }
+    },
+
+    generateRandomCoordinate () {
+      const MAX_NUMBER = 90;
+      return (Math.random() * MAX_NUMBER).toFixed(2);
+    },
+
+    fetchRandomWeatherdata () {
+      const randomLatitude = this.generateRandomCoordinate();
+      const randomLongitude = this.generateRandomCoordinate();
+      const params = { lat: randomLatitude, lon: randomLongitude };
+      this.fetchWeatherData(params);
+    },
+
+    resetWeatherForm () {
+      this.city = '';
+      this.country = '';
+      this.weatherResponse = null;
+    },
+
+    submitWeatherForm () {
+      const query = [this.city, this.country];
+      const params = { q: query.join(',') };
+      this.fetchWeatherData(params);
+    },
   }
 }
 </script>
@@ -144,6 +181,7 @@ body {
   }
 
   .weather-button {
+    display: block;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     border: 1px solid lightgrey;
@@ -153,6 +191,11 @@ body {
     &:hover {
       background-color: #EFEFEF;
       cursor: pointer;
+    }
+
+    &.is-centered {
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 
