@@ -4,6 +4,6 @@ import createOpenWeatherApi from '@/api/open-weather.js';
 // allowing developers to write this.$openWeatherApi.getWeatherData(params)
 export default (ctx, inject) => {
   const { openWeatherBaseUrl, openWeatherApiKey } = ctx.$config;
-  const openWeatherApi = createOpenWeatherApi(openWeatherBaseUrl, openWeatherApiKey);
+  const openWeatherApi = createOpenWeatherApi(ctx.$http, openWeatherBaseUrl, openWeatherApiKey);
   inject('openWeatherApi', openWeatherApi);
 };
