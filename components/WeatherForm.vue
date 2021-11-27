@@ -1,11 +1,24 @@
 <template>
   <form class="weather-form" @submit.prevent="submitWeatherForm">
     <div class="form-group">
-      <input v-model="city" name="city" placeholder="Enter city" class="form-input" required />
+      <input
+        v-model="city"
+        name="city"
+        placeholder="Enter city"
+        class="form-input"
+        required
+        data-test-id="weather-form__city-input"
+      />
     </div>
 
     <div class="form-group">
-      <input v-model="country" name="country" placeholder="Enter country (optional)" class="form-input" />
+      <input
+        v-model="country"
+        name="country"
+        placeholder="Enter country (optional)"
+        class="form-input"
+        data-test-id="weather-form__country-input"
+      />
     </div>
 
     <div class="form-group form-group__align-right">
@@ -13,6 +26,7 @@
         v-if="showResetFormButton"
         type="reset"
         class="weather-button"
+        data-test-id="weather-form__reset-button"
         @click="resetWeatherForm"
         v-text="'Reset Form'"
       />
@@ -20,6 +34,7 @@
       <button
         type="submit"
         class="weather-button"
+        data-test-id="weather-form__submit-button"
         v-text="loading ? 'loading ...' : 'Get Weather Result'"
       />
     </div>
