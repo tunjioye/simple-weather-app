@@ -8,9 +8,13 @@
         </div>
       </form>
 
-      <div v-if="formattedWeatherResponse" class="weather-reponse">
-        <h4>Weather of {{ weatherResponse.name }} city</h4>
+      <div v-if="isSuccessfulResponse" class="weather-reponse">
+        <h4>Weather Result</h4>
         <pre v-text="formattedWeatherResponse" />
+      </div>
+
+      <div v-if="isErrorResponse" class="weather-reponse is-error">
+        <p v-text="weatherResponse.message" />
       </div>
     </section>
 
@@ -30,6 +34,12 @@ export default {
     formattedWeatherResponse () {
       if (this.weatherResponse) return JSON.stringify(this.weatherResponse, null, 2);
       return null;
+    },
+    isSuccessfulResponse () {
+      return this.weatherResponse && this.weatherResponse.cod === 200;
+    },
+    isErrorResponse () {
+      return this.weatherResponse && this.weatherResponse.cod >= 400;
     }
   },
 
@@ -41,7 +51,7 @@ export default {
         const response = await this.$openWeatherApi.getWeatherData(params);
         this.weatherResponse = response;
       } catch (error) {
-        window.alert(`An Error Occured => ${error.message}`);
+        this.weatherResponse = error.response.data;
       }
     }
   }
@@ -108,9 +118,15 @@ body {
     background-color: #EAEAEA;
     border: 1px solid dimgrey;
     border-radius: 5px;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     margin: 1rem auto;
     overflow-x: auto;
+
+    &.is-error {
+      background-color: #FAEAEA;
+      border-color: darkred;
+      color: crimson;
+    }
   }
 }
 </style>
