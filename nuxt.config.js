@@ -19,12 +19,18 @@ export default {
     ]
   },
 
+  publicRuntimeConfig: {
+    openWeatherBaseUrl: process.env.OPEN_WEATHER_BASE_URL || 'http://localhost:3000',
+    openWeatherApiKey: process.env.OPEN_WEATHER_API_KEY,
+  },
+
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    { src: '~/plugins/open-weather', ssr: true },
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
