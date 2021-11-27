@@ -2,37 +2,24 @@
   <div class="home-page">
 
     <section class="weather-form-and-response">
-      <form v-if="showWeatherForm" class="weather-form" @submit.prevent="submitWeatherForm">
-        <div class="form-group">
-          <input v-model="city" name="city" placeholder="Enter city" class="form-input" required />
-        </div>
-
-        <div class="form-group">
-          <input v-model="country" name="country" placeholder="Enter country (optional)" class="form-input" />
-        </div>
-
-        <div class="form-group form-group__align-right">
-          <button v-if="weatherResponse" type="button" class="weather-button" @click="resetWeatherForm">
-            Reset Form
-          </button>
-          <button type="submit" class="weather-button">
-            {{ loadingWeatherData ? 'loading ...' : 'Get Weather Result' }}
-          </button>
-        </div>
-      </form>
+      <WeatherForm
+        v-if="showWeatherForm"
+        :loading="loadingWeatherData"
+        :show-reset-form-button="Boolean(weatherResponse)"
+        @reset-weather-form="weatherResponse = null"
+        @fetch-weather-data="fetchWeatherData"
+      />
 
       <button
         v-if="!showWeatherForm"
         type="button"
         class="weather-button is-centered"
         @click="showWeatherForm = true; weatherResponse = null;"
-      >
-        {{ loadingWeatherData ? 'loading random weather data ...' : 'Get weather for a city' }}
-      </button>
+        v-text="loadingWeatherData ? 'loading random weather data ...' : 'Get weather for a city'"
+      />
 
       <div v-if="isSuccessfulResponse" class="weather-response">
-        <h4 v-if="isWeatherResultOfRandomCoordinates">Weather result of random coordinates</h4>
-        <h4 v-else>Weather Result of {{ weatherResponse.name }} city</h4>
+        <h4 v-text="weatherResultTitle" />
         <pre v-text="formattedWeatherResponse" />
       </div>
 
@@ -45,20 +32,31 @@
 </template>
 
 <script>
+import WeatherForm from '@/components/WeatherForm';
+
 export default {
+  components: {
+    WeatherForm,
+  },
+
   data () {
     return {
       showWeatherForm: false,
-      city: '',
-      country: '',
       weatherResponse: null,
       loadingWeatherData: false,
     };
   },
 
   computed: {
-    isWeatherResultOfRandomCoordinates () {
+    isWeatherResultForRandomCoordinates () {
       return this.showWeatherForm === false;
+    },
+
+    weatherResultTitle () {
+      if (this.isWeatherResultForRandomCoordinates) {
+        return 'Weather result of random coordinates';
+      }
+      return `Weather Result of ${this.weatherResponse?.name} city`;
     },
 
     formattedWeatherResponse () {
@@ -101,18 +99,6 @@ export default {
       const randomLatitude = this.generateRandomCoordinate();
       const randomLongitude = this.generateRandomCoordinate();
       const params = { lat: randomLatitude, lon: randomLongitude };
-      this.fetchWeatherData(params);
-    },
-
-    resetWeatherForm () {
-      this.city = '';
-      this.country = '';
-      this.weatherResponse = null;
-    },
-
-    submitWeatherForm () {
-      const query = [this.city, this.country];
-      const params = { q: query.join(',') };
       this.fetchWeatherData(params);
     },
   }
