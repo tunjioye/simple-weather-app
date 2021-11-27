@@ -11,9 +11,12 @@
           <input v-model="country" name="country" placeholder="Enter country (optional)" class="form-input" />
         </div>
 
-        <div class="form-group">
-          <button type="submit" class="weather-submit-button">
-            Get Weather Result
+        <div class="form-group form-group__align-right">
+          <button v-if="weatherResponse" type="button" class="weather-button" @click="resetWeatherForm">
+            Reset Form
+          </button>
+          <button type="submit" class="weather-button">
+            {{ loadingWeatherData ? 'loading...' : 'Get Weather Result' }}
           </button>
         </div>
       </form>
@@ -38,6 +41,7 @@ export default {
       city: '',
       country: '',
       weatherResponse: null,
+      loadingWeatherData: false,
     };
   },
 
@@ -55,15 +59,23 @@ export default {
   },
 
   methods: {
+    resetWeatherForm () {
+      this.city = '';
+      this.country = '';
+      this.weatherResponse = null;
+    },
     async submitWeatherForm () {
       const query = [this.city, this.country];
       const params = { q: query.join(',') };
 
       try {
+        this.loadingWeatherData = true;
         const response = await this.$openWeatherApi.getWeatherData(params);
         this.weatherResponse = response;
       } catch (error) {
         this.weatherResponse = error.response.data;
+      } finally {
+        this.loadingWeatherData = false;
       }
     }
   }
@@ -108,6 +120,10 @@ body {
     &:not(:last-child) {
       margin-bottom: 1rem;
     }
+
+    &__align-right {
+      justify-content: flex-end;
+    }
   }
 
   .form-input {
@@ -127,9 +143,7 @@ body {
     }
   }
 
-  .weather-submit-button {
-    display: block;
-    margin-left: auto;
+  .weather-button {
     padding: 0.75rem 1rem;
     font-size: 1rem;
     border: 1px solid lightgrey;
