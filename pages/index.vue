@@ -131,41 +131,6 @@ body {
     }
   }
 
-  .weather-form {
-    width: 100%;
-  }
-
-  .form-group {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-
-    &:not(:last-child) {
-      margin-bottom: 1rem;
-    }
-
-    &__align-right {
-      justify-content: flex-end;
-    }
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 1rem;
-    font-size: large;
-    border: 1px solid lightgrey;
-    border-radius: 5px;
-    outline: none;
-
-    &:focus-within {
-      border-color: black;
-    }
-
-    &::placeholder {
-      color: grey;
-    }
-  }
-
   .weather-button {
     display: block;
     padding: 0.75rem 1rem;
