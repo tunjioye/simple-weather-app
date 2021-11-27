@@ -4,16 +4,26 @@
     <section class="weather-form-and-response">
       <form class="weather-form" @submit.prevent="submitWeatherForm">
         <div class="form-group">
-          <input v-model="city" name="city" placeholder="Enter city" class="form-input" />
+          <input v-model="city" name="city" placeholder="Enter city" class="form-input" required />
+        </div>
+
+        <div class="form-group">
+          <input v-model="country" name="country" placeholder="Enter country (optional)" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="weather-submit-button">
+            Get Weather Result
+          </button>
         </div>
       </form>
 
-      <div v-if="isSuccessfulResponse" class="weather-reponse">
+      <div v-if="isSuccessfulResponse" class="weather-response">
         <h4>Weather Result</h4>
         <pre v-text="formattedWeatherResponse" />
       </div>
 
-      <div v-if="isErrorResponse" class="weather-reponse is-error">
+      <div v-if="isErrorResponse" class="weather-response is-error">
         <p v-text="weatherResponse.message" />
       </div>
     </section>
@@ -26,6 +36,7 @@ export default {
   data () {
     return {
       city: '',
+      country: '',
       weatherResponse: null,
     };
   },
@@ -45,7 +56,8 @@ export default {
 
   methods: {
     async submitWeatherForm () {
-      const params = { q: this.city };
+      const query = [this.city, this.country];
+      const params = { q: query.join(',') };
 
       try {
         const response = await this.$openWeatherApi.getWeatherData(params);
@@ -89,6 +101,8 @@ body {
   }
 
   .form-group {
+    display: flex;
+    gap: 1rem;
     width: 100%;
 
     &:not(:last-child) {
@@ -113,7 +127,22 @@ body {
     }
   }
 
-  .weather-reponse {
+  .weather-submit-button {
+    display: block;
+    margin-left: auto;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    background-color: #EAEAEA;
+
+    &:hover {
+      background-color: #EFEFEF;
+      cursor: pointer;
+    }
+  }
+
+  .weather-response {
     width: 100%;
     background-color: #EAEAEA;
     border: 1px solid dimgrey;

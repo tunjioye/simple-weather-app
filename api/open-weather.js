@@ -8,6 +8,9 @@ export default ($http, openWeatherBaseUrl, openWeatherApiKey) => ({
     // append openWeatherApiKey as appid according to open weather documentation
     params = {...params, appid: openWeatherApiKey};
 
-    return $http.$get(`${openWeatherBaseUrl}/data/2.5/weather?${QS.stringify(params)}`);
+    // disable query encoding => encoding changes special characters
+    const query = QS.stringify(params, { encode: false });
+
+    return $http.$get(`${openWeatherBaseUrl}/data/2.5/weather?${query}`);
   },
 });
