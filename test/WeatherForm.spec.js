@@ -54,4 +54,18 @@ describe('WeatherForm', () => {
     const resetButton = wrapper.find('[data-test-id="weather-form__reset-button"]')
     expect(resetButton.exists()).toBe(true)
   })
+
+  test('submit button text should be laoding ... when loading props is true', () => {
+    const wrapper = mount(WeatherForm, {
+      propsData: {
+        ...defaultProps,
+        loading: true
+      },
+      data() { return defaultData },
+    })
+
+    const submitButton = wrapper.find('[data-test-id="weather-form__submit-button"]')
+    expect(submitButton.exists()).toBe(true)
+    expect(submitButton.text()).toContain('loading')
+  })
 })
